@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #F6F3EC;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <VBox prefHeight="755.0" prefWidth="733.0" spacing="30.0" BorderPane.alignment="TOP_LEFT">
+         <children>
+            <Label styleClass="heading" text="LATEST RECIPES">
+               <font>
+                  <Font name="Bookman Old Style Bold" size="24.0" />
+               </font></Label>
+            <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <ToggleButton mnemonicParsing="false" selected="true" styleClass="category-button" text="All" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Breakfast" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Brunch" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Lunch" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Dinner" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Dessert" />
+                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Snack" />
+               </children>
+            </HBox>
+            <FlowPane hgap="20.0" prefHeight="580.0" prefWidth="763.0" prefWrapLength="850.0" vgap="20.0">
+               <children>
+                  <VBox prefHeight="280.0" prefWidth="179.0" spacing="10.0" styleClass="recipe-card">
+                     <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                     </padding>
+                     <children>
+                        <ImageView fitHeight="150.0" fitWidth="193.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label styleClass="recipe-name" text="recipeName" />
+                        <Label styleClass="recipe-category" text="recipeCategory" />
+                        <Label styleClass="recipe-time" text="recipeTime" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="280.0" prefWidth="179.0" spacing="10.0" styleClass="recipe-card">
+                     <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                     </padding>
+                     <children>
+                        <ImageView fitHeight="150.0" fitWidth="193.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label styleClass="recipe-name" text="recipeName" />
+                        <Label styleClass="recipe-category" text="recipeCategory" />
+                        <Label styleClass="recipe-time" text="recipeTime" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="280.0" prefWidth="179.0" spacing="10.0" styleClass="recipe-card">
+                     <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                     </padding>
+                     <children>
+                        <ImageView fitHeight="150.0" fitWidth="193.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label styleClass="recipe-name" text="recipeName" />
+                        <Label styleClass="recipe-category" text="recipeCategory" />
+                        <Label styleClass="recipe-time" text="recipeTime" />
+                     </children>
+                  </VBox>
+               </children>
+            </FlowPane>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+      </VBox>
+   </center>
+   <top>
+      <VBox prefHeight="75.0" prefWidth="1000.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="21.0" prefWidth="1000.0">
+               <children>
+                  <Label prefHeight="31.0" prefWidth="223.0" styleClass="app-title" text="Dish It">
+                     <font>
+                        <Font name="Arial Black" size="21.0" />
+                     </font>
+                  </Label>
+                  <TextField prefHeight="51.0" prefWidth="350.0" promptText="Search recipes..." styleClass="search-field" />
+                  <Button mnemonicParsing="false" prefHeight="30.0" styleClass="search-button" text="Search" />
+                  <Button alignment="TOP_LEFT" mnemonicParsing="false" text="Recipe Manager" />
+               </children>
+            </HBox>
+            <HBox prefHeight="31.0" prefWidth="1000.0">
+               <children>
+                  <Button mnemonicParsing="false" styleClass="nav-button" text="Home" />
+                  <Button mnemonicParsing="false" styleClass="nav-button" text="Recipes" />
+                  <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="85.0" styleClass="nav-button" text="Favorites" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </top>
+   <right>
+      <ScrollBar orientation="VERTICAL" BorderPane.alignment="CENTER" />
+   </right>
+</BorderPane>
