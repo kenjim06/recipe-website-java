@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Dish It",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-f",
+                "${workspaceFolder}/DishItFX/pom.xml",
+                "javafx:run"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Dish It",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-f",
+                "${workspaceFolder}/DishItFX/pom.xml",
+                "clean",
+                "package"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}
