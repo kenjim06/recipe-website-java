@@ -16,13 +16,13 @@
          <children>
             <HBox alignment="CENTER_LEFT" prefHeight="45.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <PasswordField promptText="username" />
+                  <PasswordField fx:id="emailTF" promptText="Enter Email" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="40.0" prefHeight="45.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <PasswordField promptText="password" />
-                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#goHome" text="Login" />
+                  <PasswordField fx:id="passwordTF" promptText="Enter Password" />
+                  <Button alignment="CENTER" mnemonicParsing="false" onAction="#login" text="Login" />
                </children>
             </HBox>
          </children>

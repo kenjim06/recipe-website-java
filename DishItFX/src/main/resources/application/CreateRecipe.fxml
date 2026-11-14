@@ -51,8 +51,8 @@
                         <Insets right="10.0" />
                      </padding>
                   </Label>
-                  <TextField prefHeight="25.0" prefWidth="335.0" promptText="Enter recipe name" />
-                  <Button mnemonicParsing="false" text="Enter" />
+                  <TextField fx:id="recipeNameField" prefHeight="25.0" prefWidth="335.0" promptText="Enter recipe name" />
+                  <Button mnemonicParsing="false" text="Enter" onAction="#testName" />
                </children>
             </HBox>
             <HBox prefHeight="45.0" prefWidth="765.0">
