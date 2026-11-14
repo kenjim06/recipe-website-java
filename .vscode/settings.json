@@ -3,5 +3,6 @@
         "**/bin": true,
         "**/node_modules": true,
         "**/target": true
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
