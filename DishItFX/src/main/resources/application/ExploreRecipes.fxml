@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="700.0" prefWidth="1100.0" styleClass="home-page" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.ExploreRecipesController">
+   <top>
+      <fx:include source="Header.fxml" />
+   </top>
+   <left>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="filter-scroll" vbarPolicy="AS_NEEDED">
+         <content>
+            <VBox fx:id="timeFilters" spacing="8.0" styleClass="filter-sidebar">
+               <children>
+                  <Label styleClass="filter-title" text="Filters" />
+                  <Label styleClass="filter-heading" text="Time" />
+                  <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under 15 min" />
+                  <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under 30 min" />
+                  <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under 60 min" />
+                  <Label styleClass="filter-heading" text="Allergies to exclude" />
+                  <VBox fx:id="allergyFilters" spacing="6.0">
+                     <children>
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Nuts" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Peanuts" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Tree nuts" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Dairy" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Eggs" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Gluten" />
+                     </children>
+                  </VBox>
+                  <Label styleClass="filter-heading" text="Budget per serving" />
+                  <VBox fx:id="budgetFilters" spacing="6.0">
+                     <children>
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under $5" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under $10" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Under $20" />
+                     </children>
+                  </VBox>
+                  <Label styleClass="filter-heading" text="Meal type" />
+                  <VBox fx:id="mealFilters" spacing="6.0">
+                     <children>
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Breakfast" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Lunch" />
+                        <CheckBox mnemonicParsing="false" onAction="#filterRecipes" text="Dinner" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </left>
+   <center>
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="recipe-scroll" vbarPolicy="AS_NEEDED">
+         <content>
+            <VBox spacing="16.0">
+               <children>
+                  <Label styleClass="heading" text="DISCOVER RECIPES" />
+                  <Label styleClass="filter-heading" text="Popular recipes" />
+                  <FlowPane fx:id="popularRecipeCards" hgap="14.0" prefWrapLength="780.0" vgap="14.0" />
+                  <Label styleClass="filter-heading" text="From the community" />
+                  <FlowPane fx:id="communityRecipeCards" hgap="14.0" prefWrapLength="780.0" vgap="14.0" />
+               </children>
+               <padding>
+                  <Insets bottom="24.0" left="24.0" right="24.0" top="24.0" />
+               </padding>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

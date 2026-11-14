@@ -1,5 +1,10 @@
 package application.controllers;
 
-public class MyRecipesController extends NavigationController {
+import javafx.fxml.FXML;
 
+public class MyRecipesController extends RecipeCollectionController {
+    @FXML
+    private void initialize() {
+        initializeCollection("MY RECIPES");
+    }
 }

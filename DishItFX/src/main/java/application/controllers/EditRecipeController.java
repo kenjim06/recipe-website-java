@@ -1,5 +1,5 @@
 package application.controllers;
 
-public class EditRecipeController extends NavigationController {
+public class EditRecipeController extends HeaderController {
 
 }
