@@ -1,0 +1,187 @@
+
+.root {
+    -fx-font-family: "Arial";
+    -fx-background-color: #F6F3EC;
+}
+
+.header {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 10px 25px;
+    -fx-spacing: 25px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.app-title {
+    -fx-font-size: 27px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #345642;
+}
+
+.nav-button {
+    -fx-background-color: #E3EADD;
+    -fx-text-fill: #345642;
+    -fx-padding: 8px 16px;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-color: #345642;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+}
+
+
+
+.heading {
+	-fx-font-family: "Bookman Old Style";
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.search-field {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #D6DED2;
+    -fx-border-radius: 10px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+}
+
+.search-button {
+    -fx-background-color: #345642;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.rm-button {
+    -fx-background-color: #345642;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.category-button {
+    -fx-background-color: #E3EADD;
+    -fx-text-fill: #345642;
+    -fx-background-radius: 18px;
+    -fx-padding: 8px 16px;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+}
+
+.category-button:selected {
+    -fx-background-color: #345642;
+    -fx-text-fill: white;
+}
+
+.recipe-card {
+    -fx-background-color: white;
+    -fx-background-radius: 14px;
+    -fx-padding: 12px;
+    -fx-spacing: 10px;
+    -fx-border-color: #E3EADD;
+    -fx-border-radius: 14px;
+}
+
+
+.recipe-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.recipe-category {
+    -fx-font-size: 12px;
+    -fx-text-fill: #345642;
+}
+
+.recipe-time {
+    -fx-font-size: 12px;
+    -fx-text-fill: #777777;
+}
+
+.text-text{
+	-fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.submit-button{
+	-fx-background-color: #345642;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.create-button{
+	-fx-background-color: #345642;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.log-text{
+	-fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.heading-filter-1{
+	-fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.heading-filter-2{
+	-fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.checkbox-text{
+	-fx-font-size: 12px;
+    -fx-text-fill: #263B2D;
+}
+
+.heading-sort{
+	-fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.filter-button{
+	-fx-background-color: #345642;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.small-header{
+	-fx-font-family: "Bookman Old Style";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+.variable-text{
+	
+    -fx-font-family: "Bookman Old Style";
+    -fx-font-size: 14px;
+    -fx-text-fill: #263B2D;
+}
+
+.recipe-name{
+	-fx-font-family: "Bookman Old Style";
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #263B2D;
+}
+
+
+/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
