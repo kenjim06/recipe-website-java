@@ -39,3 +39,18 @@ mvn -f DishItFX/pom.xml clean package
 Maven resolves JavaFX and its platform-specific libraries from `pom.xml`; you
 do not need to add a JavaFX SDK to Eclipse's build path. To compile and package
 from Eclipse, run the Maven goal `clean package` instead.
+
+## Supabase configuration
+
+The JavaFX client reads `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` from its
+environment. Set both in the environment used to launch the app. Use a
+publishable key only; never put a Supabase secret or `service_role` key in this
+client.
+
+Sign-in and account creation use Supabase Auth. Recipe operations use the
+PostgREST `recipes` table and the authenticated user's access token. The current
+mapping expects `id`, `recipe_name`, `userID`, `categories`, `prep_time`,
+`cook_time`, `ingredients`, `instructions`, and `notes`; `categories` should
+be a text array, while ingredients and instructions are line-separated text.
+Configure row-level security policies for authenticated users before enabling
+recipe writes.
