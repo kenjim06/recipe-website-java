@@ -7,91 +7,117 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
-public final class SupabaseClient {
-    private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+public class SupabaseClient {
 
-    private final String projectUrl;
-    private final String publishableKey;
+    private final String supabaseUrl;
+    private final String supabaseKey;
 
-    private SupabaseClient(String projectUrl, String publishableKey) {
-        this.projectUrl = projectUrl;
-        this.publishableKey = publishableKey;
+    private final HttpClient httpClient;
+
+    public SupabaseClient(String supabaseUrl, String supabaseKey) {
+        if (supabaseUrl == null || supabaseUrl.isBlank()
+                || supabaseKey == null || supabaseKey.isBlank()) {
+            throw new IllegalArgumentException("Supabase URL and publishable key are required.");
+        }
+        this.supabaseUrl = supabaseUrl.strip().replaceAll("/+$", "");
+        this.supabaseKey = supabaseKey.strip();
+
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
+    // Create a client using environment variables.
     public static SupabaseClient fromEnvironment() {
-        String projectUrl = System.getenv("SUPABASE_URL");
-        String publishableKey = System.getenv("SUPABASE_PUBLISHABLE_KEY");
-        if (projectUrl == null || projectUrl.isBlank()
-                || publishableKey == null || publishableKey.isBlank()) {
+
+        String url = SupabaseConfig.SUPABASE_URL;
+        String key = SupabaseConfig.SUPABASE_KEY;
+
+        if (url == null || url.isBlank()
+                || key == null || key.isBlank()) {
             throw new SupabaseException(
-                    "Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY to enable Supabase.");
+                    "Supabase is not configured. Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY."
+            );
         }
 
-        URI uri = URI.create(projectUrl.strip());
-        if (!"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null) {
-            throw new SupabaseException("SUPABASE_URL must be a valid HTTPS project URL.");
-        }
-        return new SupabaseClient(
-                projectUrl.strip().replaceAll("/+$", ""),
-                publishableKey.strip());
+        return new SupabaseClient(url, key);
     }
 
+    // General HTTP request method.
     public String request(
             String method,
-            String path,
-            String jsonBody,
+            String endpoint,
+            String body,
             String accessToken,
             String prefer) {
-        if (path == null || !path.startsWith("/")) {
-            throw new IllegalArgumentException("Supabase request paths must start with '/'.");
-        }
-
-        HttpRequest.Builder request = HttpRequest.newBuilder()
-                .uri(URI.create(projectUrl + path))
-                .timeout(Duration.ofSeconds(30))
-                .header("apikey", publishableKey)
-                .header("Accept", "application/json");
-        if (accessToken != null && !accessToken.isBlank()) {
-            request.header("Authorization", "Bearer " + accessToken);
-        }
-        if (prefer != null && !prefer.isBlank()) {
-            request.header("Prefer", prefer);
-        }
-        if (jsonBody == null) {
-            request.method(method, HttpRequest.BodyPublishers.noBody());
-        } else {
-            request.header("Content-Type", "application/json")
-                    .method(method, HttpRequest.BodyPublishers.ofString(jsonBody));
-        }
 
         try {
-            HttpResponse<String> response = HTTP_CLIENT.send(
-                    request.build(),
-                    HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() < 200 || response.statusCode() >= 300) {
-                throw new SupabaseException(
-                        "Supabase request failed with HTTP " + response.statusCode() + ".");
+
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create(supabaseUrl + endpoint))
+                    .timeout(Duration.ofSeconds(30))
+                    .header("apikey", supabaseKey)
+                    .header("Authorization", "Bearer " + 
+                            (accessToken != null ? accessToken : supabaseKey))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json");
+
+            // Optional Supabase Prefer header.
+            if (prefer != null && !prefer.isBlank()) {
+                requestBuilder.header("Prefer", prefer);
             }
+
+            // Set HTTP method and request body.
+            if (body != null) {
+
+                requestBuilder.method(
+                        method,
+                        HttpRequest.BodyPublishers.ofString(body)
+                );
+
+            } else {
+
+                requestBuilder.method(
+                        method,
+                        HttpRequest.BodyPublishers.noBody()
+                );
+            }
+
+            HttpRequest request = requestBuilder.build();
+
+            // Send request.
+            HttpResponse<String> response = httpClient.send(
+                    request,
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            // Check response.
+            if (response.statusCode() < 200 ||
+                    response.statusCode() >= 300) {
+
+                throw new SupabaseException(
+                        "Supabase request failed. Status: "
+                        + response.statusCode()
+                        + "\nResponse: "
+                        + response.body()
+                );
+            }
+
             return response.body();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new SupabaseException("Supabase request was interrupted.", e);
+
         } catch (IOException e) {
-            throw new SupabaseException("Could not reach Supabase.", e);
-        }
-    }
 
-    public static final class SupabaseException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
+            throw new SupabaseException(
+                    "Could not connect to Supabase: " + e.getMessage()
+            );
 
-        public SupabaseException(String message) {
-            super(message);
-        }
+        } catch (InterruptedException e) {
 
-        public SupabaseException(String message, Throwable cause) {
-            super(message, cause);
+            Thread.currentThread().interrupt();
+
+            throw new SupabaseException(
+                    "Supabase request was interrupted."
+            );
         }
     }
 }

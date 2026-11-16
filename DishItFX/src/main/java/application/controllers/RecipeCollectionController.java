@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import application.models.Recipe;
 import application.services.RecipeService;
-import application.services.SupabaseClient.SupabaseException;
+import application.services.SupabaseException;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

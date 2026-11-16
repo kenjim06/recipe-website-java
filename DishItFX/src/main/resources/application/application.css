@@ -245,6 +245,32 @@
     -fx-max-height: 160px;
 }
 
+.recipe-detail-image-box {
+    -fx-background-color: #F0F0ED;
+    -fx-background-radius: 9px;
+    -fx-border-color: #E4E3DE;
+    -fx-border-radius: 9px;
+    -fx-min-width: 0;
+    -fx-pref-width: 640px;
+    -fx-max-width: Infinity;
+    -fx-min-height: 0;
+    -fx-max-height: Infinity;
+}
+
+.recipe-detail-section {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 16px;
+    -fx-spacing: 8px;
+}
+
+.recipe-detail-text {
+    -fx-font-family: "Nunito";
+    -fx-font-size: 14px;
+    -fx-text-fill: #4B5148;
+    -fx-line-spacing: 3px;
+}
+
 .recipe-card-action {
     -fx-background-color: #262626;
     -fx-background-radius: 18px;

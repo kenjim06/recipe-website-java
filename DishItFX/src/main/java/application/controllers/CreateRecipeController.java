@@ -2,11 +2,10 @@ package application.controllers;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import application.models.Recipe;
 import application.services.RecipeService;
-import application.services.SupabaseClient.SupabaseException;
+import application.services.SupabaseException;
 import application.services.UserService;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -62,26 +61,33 @@ public class CreateRecipeController extends HeaderController {
             formFeedback.setText("Add a recipe name, category, ingredients, and instructions.");
             return;
         }
+        if (!UserService.isLoggedIn()) {
+            formFeedback.setText("Log in before saving a recipe to Supabase.");
+            return;
+        }
 
         try {
             int prepTime = Integer.parseInt(prepTimeField.getText().strip());
             int cookTime = Integer.parseInt(cookTimeField.getText().strip());
             Recipe recipe = new Recipe(
-                    UUID.randomUUID().toString(),
+                    0L,
                     recipeName,
                     category,
                     prepTime,
                     cookTime,
                     ingredients,
                     instructions,
-                    notesField.getText());
+                    notesField.getText(),
+                    "",
+                    "",
+                    0,
+                    "",
+                    0);
             recipeService.saveRecipe(recipe);
 
             Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
             confirmation.setHeaderText("Recipe saved");
-            confirmation.setContentText(UserService.isLoggedIn()
-                    ? "This recipe was saved to your Supabase account."
-                    : "This recipe is saved for this session. Log in to sync recipes with Supabase.");
+            confirmation.setContentText("This recipe was saved to your Supabase account.");
             confirmation.showAndWait();
             goToMyRecipes(event);
         } catch (NumberFormatException e) {

@@ -2,10 +2,10 @@ package application.services;
 
 import java.util.Objects;
 
-import application.models.User;
-import application.services.SupabaseClient.SupabaseException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import application.models.User;
 
 public class UserService {
     private static volatile String accessToken;

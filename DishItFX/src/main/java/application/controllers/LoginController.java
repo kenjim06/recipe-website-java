@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.services.SupabaseClient.SupabaseException;
+import application.services.SupabaseException;
 import application.services.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

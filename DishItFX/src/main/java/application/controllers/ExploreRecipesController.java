@@ -1,14 +1,15 @@
 package application.controllers;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import application.models.CommunityRecipe;
 import application.models.Recipe;
 import application.services.RecipeService;
+import application.services.SupabaseException;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -38,9 +39,16 @@ public class ExploreRecipesController extends HeaderController {
     private FlowPane communityRecipeCards;
 
     private final RecipeService recipeService = new RecipeService();
+    private List<Recipe> recipes = List.of();
+    private String loadError;
 
     @FXML
     private void initialize() {
+        try {
+            recipes = recipeService.getHomePageRecipes();
+        } catch (SupabaseException e) {
+            loadError = e.getMessage();
+        }
         renderRecipes();
     }
 
@@ -50,46 +58,59 @@ public class ExploreRecipesController extends HeaderController {
     }
 
     private void renderRecipes() {
-        List<CommunityRecipe> visibleRecipes = recipeService.getCommunityRecipes().stream()
-                .sorted(Comparator.comparingInt(CommunityRecipe::popularity).reversed())
+        popularRecipeCards.getChildren().clear();
+        communityRecipeCards.getChildren().clear();
+        if (loadError != null) {
+            showEmptyState(popularRecipeCards, loadError);
+            showEmptyState(communityRecipeCards, loadError);
+            return;
+        }
+
+        List<Recipe> visibleRecipes = recipes.stream()
+                .sorted(Comparator.comparingInt(Recipe::popularity).reversed())
                 .filter(this::matchesTime)
                 .filter(this::matchesAllergies)
                 .filter(this::matchesBudget)
                 .filter(this::matchesMealType)
                 .toList();
 
-        popularRecipeCards.getChildren().clear();
         visibleRecipes.stream()
                 .limit(3)
                 .map(this::createRecipeCard)
                 .forEach(popularRecipeCards.getChildren()::add);
 
-        communityRecipeCards.getChildren().clear();
         visibleRecipes.stream()
                 .map(this::createRecipeCard)
                 .forEach(communityRecipeCards.getChildren()::add);
 
         if (visibleRecipes.isEmpty()) {
-            Label emptyState = new Label("No community recipes match these filters.");
-            emptyState.getStyleClass().add("empty-state");
-            communityRecipeCards.getChildren().add(emptyState);
+            showEmptyState(communityRecipeCards, "No community recipes match these filters.");
         }
     }
 
-    private boolean matchesTime(CommunityRecipe listing) {
+    private void showEmptyState(FlowPane target, String message) {
+        Label emptyState = new Label(message);
+        emptyState.getStyleClass().add("empty-state");
+        emptyState.setWrapText(true);
+        target.getChildren().add(emptyState);
+    }
+
+    private boolean matchesTime(Recipe listing) {
         int selectedLimit = selectedCheckBoxes(timeFilters).stream()
                 .mapToInt(this::numericLimit)
                 .min()
                 .orElse(Integer.MAX_VALUE);
-        return listing.recipe().totalTimeMinutes() < selectedLimit;
+        return listing.totalTimeMinutes() < selectedLimit;
     }
 
-    private boolean matchesAllergies(CommunityRecipe listing) {
+    private boolean matchesAllergies(Recipe listing) {
         Set<String> exclusions = selectedCheckBoxes(allergyFilters).stream()
                 .map(checkBox -> checkBox.getText().toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());
-        Set<String> allergens = listing.allergens().stream()
-                .map(value -> value.toLowerCase(Locale.ROOT))
+        Set<String> allergens = Arrays.stream(
+                listing.allergens().toLowerCase(Locale.ROOT).split(","))
+                .map(String::strip)
+                .filter(value -> !value.isEmpty())
                 .collect(Collectors.toSet());
 
         return exclusions.stream().noneMatch(allergen ->
@@ -99,7 +120,7 @@ public class ExploreRecipesController extends HeaderController {
                         : allergens.contains(allergen));
     }
 
-    private boolean matchesBudget(CommunityRecipe listing) {
+    private boolean matchesBudget(Recipe listing) {
         int selectedLimit = selectedCheckBoxes(budgetFilters).stream()
                 .mapToInt(this::numericLimit)
                 .min()
@@ -107,12 +128,12 @@ public class ExploreRecipesController extends HeaderController {
         return listing.estimatedCostDollars() < selectedLimit;
     }
 
-    private boolean matchesMealType(CommunityRecipe listing) {
+    private boolean matchesMealType(Recipe listing) {
         Set<String> selectedMeals = selectedCheckBoxes(mealFilters).stream()
                 .map(checkBox -> checkBox.getText().toLowerCase(Locale.ROOT))
                 .collect(Collectors.toSet());
         return selectedMeals.isEmpty()
-                || selectedMeals.contains(listing.recipe().category().toLowerCase(Locale.ROOT));
+                || selectedMeals.contains(listing.category().toLowerCase(Locale.ROOT));
     }
 
     private List<CheckBox> selectedCheckBoxes(VBox filterGroup) {
@@ -128,15 +149,15 @@ public class ExploreRecipesController extends HeaderController {
         return Integer.parseInt(digits);
     }
 
-    private VBox createRecipeCard(CommunityRecipe listing) {
-        Recipe recipe = listing.recipe();
+    private VBox createRecipeCard(Recipe listing) {
+        String author = listing.userName().isBlank() ? "Community" : listing.userName();
         return RecipeCardFactory.create(
-                recipe,
+                listing,
                 List.of(
-                        "By " + listing.author() + " | $" + listing.estimatedCostDollars(),
+                        "By " + author + " | $" + listing.estimatedCostDollars(),
                         (listing.popularity() >= 100 ? "Popular | " : "")
                                 + listing.popularity() + " saves"),
-                source -> openRecipe(source, recipe));
+                source -> openRecipe(source, listing));
     }
 
     private void openRecipe(Node source, Recipe recipe) {

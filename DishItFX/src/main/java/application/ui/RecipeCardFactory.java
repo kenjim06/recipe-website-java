@@ -33,9 +33,14 @@ public final class RecipeCardFactory {
                 + ", " + recipe.totalTimeMinutes() + " minutes");
         card.setFocusTraversable(true);
 
-        Label name = new Label(recipe.name());
+        Label name;
+
+        if(recipe.name().length() > 20){
+            name = new Label(recipe.name().substring(0,18) + "...");
+        } else {
+            name = new Label(recipe.name());
+        }
         name.getStyleClass().add("recipe-name");
-        name.setWrapText(true);
 
         StackPane imageBox = new StackPane();
         imageBox.setMinHeight(128.0);
@@ -48,6 +53,7 @@ public final class RecipeCardFactory {
         imageView.setFitHeight(145.0);
         imageView.setPreserveRatio(true);
         imageView.setAccessibleText(recipe.name() + " image");
+        RecipeImageLoader.loadCover(imageView, imageBox, recipe.imageUrl());
         imageBox.getChildren().add(imageView);
 
         Label category = new Label(recipe.category().toUpperCase(Locale.ROOT));

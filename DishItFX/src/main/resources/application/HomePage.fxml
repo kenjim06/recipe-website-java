@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="600.0" prefWidth="1000.0" styleClass="home-page" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.HomePageController">
    <top>
@@ -30,13 +27,13 @@
             </HBox>
             <HBox fx:id="categoryFilters" alignment="CENTER_LEFT" spacing="8.0">
                <children>
-                  <ToggleButton fx:id="allCategoryButton" mnemonicParsing="false" selected="true" styleClass="category-button" text="All" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Breakfast" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Brunch" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Lunch" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Dinner" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Dessert" onAction="#filterRecipes" />
-                  <ToggleButton mnemonicParsing="false" styleClass="category-button" text="Snack" onAction="#filterRecipes" />
+                  <ToggleButton fx:id="allCategoryButton" mnemonicParsing="false" onAction="#filterRecipes" selected="true" styleClass="category-button" text="All" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Breakfast" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Brunch" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Lunch" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Dinner" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Dessert" />
+                  <ToggleButton mnemonicParsing="false" onAction="#filterRecipes" styleClass="category-button" text="Snack" />
                </children>
             </HBox>
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="recipe-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">

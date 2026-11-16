@@ -1,12 +1,15 @@
 package application.controllers;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import application.models.Recipe;
-import javafx.collections.FXCollections;
+import application.ui.RecipeImageLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 
 public class DisplayRecipeController extends HeaderController {
     @FXML
@@ -22,28 +25,50 @@ public class DisplayRecipeController extends HeaderController {
     private Label cookTimeLabel;
 
     @FXML
-    private ListView<String> ingredientsList;
+    private Label ingredientsText;
 
     @FXML
-    private ListView<String> instructionsList;
+    private Label instructionsText;
 
     @FXML
-    private ListView<String> notesList;
+    private Label notesText;
+
+    @FXML
+    private StackPane recipeImageFrame;
+
+    @FXML
+    private ImageView recipeImageView;
 
     public void setRecipe(Recipe recipe) {
         recipeNameLabel.setText(recipe.name());
+        recipeNameLabel.setWrapText(true);
+        recipeNameLabel.setMaxWidth(Double.MAX_VALUE);
         categoryLabel.setText(recipe.category());
         prepTimeLabel.setText(recipe.prepTimeMinutes() + " min");
         cookTimeLabel.setText(recipe.cookTimeMinutes() + " min");
-        setListContent(ingredientsList, recipe.ingredients(), "No ingredients available yet.");
-        setListContent(instructionsList, recipe.instructions(), "No instructions available yet.");
-        setListContent(notesList,
-                recipe.notes().isBlank() ? List.of() : List.of(recipe.notes()),
-                "No notes.");
+        recipeImageFrame.prefHeightProperty().bind(
+                recipeImageFrame.widthProperty().multiply(9.0 / 16.0));
+        RecipeImageLoader.loadCover(recipeImageView, recipeImageFrame, recipe.imageUrl());
+        ingredientsText.setText(formatIngredients(recipe.ingredients()));
+        instructionsText.setText(formatInstructions(recipe.instructions()));
+        notesText.setText(recipe.notes().isBlank() ? "No notes." : recipe.notes());
     }
 
-    private void setListContent(ListView<String> listView, List<String> values, String emptyMessage) {
-        listView.setItems(FXCollections.observableArrayList(values));
-        listView.setPlaceholder(new Label(emptyMessage));
+    private static String formatIngredients(List<String> ingredients) {
+        return ingredients.isEmpty()
+                ? "No ingredients available yet."
+                : ingredients.stream()
+                        .map(ingredient -> "- " + ingredient)
+                        .collect(Collectors.joining(System.lineSeparator()));
+    }
+
+    private static String formatInstructions(List<String> instructions) {
+        return instructions.isEmpty()
+                ? "No instructions available yet."
+                : IntStream.range(0, instructions.size())
+                        .mapToObj(index -> "Step " + (index + 1) + ":"
+                                + System.lineSeparator() + instructions.get(index))
+                        .collect(Collectors.joining(
+                                System.lineSeparator() + System.lineSeparator()));
     }
 }

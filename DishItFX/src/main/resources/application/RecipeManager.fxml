@@ -28,6 +28,7 @@
                      </children>
                   </VBox>
                   <Button onAction="#goToCreateRecipe" styleClass="primary-button" text="Create a recipe" />
+                  <Button onAction="#goToEditRecipe" styleClass="secondary-button" text="Edit a recipe" />
                </children>
             </HBox>
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="recipe-scroll" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">

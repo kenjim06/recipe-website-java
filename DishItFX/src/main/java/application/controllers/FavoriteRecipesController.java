@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import application.models.Recipe;
 import application.services.RecipeService;
+import application.services.SupabaseException;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,9 +23,16 @@ public class FavoriteRecipesController extends HeaderController {
 
     private final RecipeService recipeService = new RecipeService();
     private String searchQuery = "";
+    private List<Recipe> recipes = List.of();
+    private String loadError;
 
     @FXML
     private void initialize() {
+        try {
+            recipes = recipeService.getSavedRecipes();
+        } catch (SupabaseException e) {
+            loadError = e.getMessage();
+        }
         renderRecipes();
     }
 
@@ -38,14 +46,20 @@ public class FavoriteRecipesController extends HeaderController {
             return;
         }
 
+        recipeCards.getChildren().clear();
+        if (loadError != null) {
+            resultsLabel.setText("Could not load saved recipes.");
+            showEmptyState(loadError);
+            return;
+        }
+
         String query = searchQuery.toLowerCase(Locale.ROOT);
-        List<Recipe> visibleRecipes = recipeService.getSavedRecipes().stream()
+        List<Recipe> visibleRecipes = recipes.stream()
                 .filter(recipe -> query.isEmpty()
                         || recipe.name().toLowerCase(Locale.ROOT).contains(query)
                         || recipe.category().toLowerCase(Locale.ROOT).contains(query))
                 .toList();
 
-        recipeCards.getChildren().clear();
         visibleRecipes.stream()
                 .map(recipe -> RecipeCardFactory.create(
                         recipe,
@@ -56,12 +70,17 @@ public class FavoriteRecipesController extends HeaderController {
         int count = visibleRecipes.size();
         resultsLabel.setText(count + (count == 1 ? " saved recipe" : " saved recipes"));
         if (count == 0) {
-            Label emptyState = new Label(query.isEmpty()
+            showEmptyState(query.isEmpty()
                     ? "You have no saved recipes yet."
                     : "No saved recipes match your search.");
-            emptyState.getStyleClass().add("empty-state");
-            recipeCards.getChildren().add(emptyState);
         }
+    }
+
+    private void showEmptyState(String message) {
+        Label emptyState = new Label(message);
+        emptyState.getStyleClass().add("empty-state");
+        emptyState.setWrapText(true);
+        recipeCards.getChildren().add(emptyState);
     }
 
     private void openRecipe(Node source, Recipe recipe) {

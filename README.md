@@ -47,6 +47,10 @@ environment. Set both in the environment used to launch the app. Use a
 publishable key only; never put a Supabase secret or `service_role` key in this
 client.
 
+Enter into terminal:
+$env:SUPABASE_KEY="1234..."
+$env:SUPABASE_URL="https//..."
+
 Sign-in and account creation use Supabase Auth. Recipe operations use the
 PostgREST `recipes` table and the authenticated user's access token. The current
 mapping expects `id`, `recipe_name`, `userID`, `categories`, `prep_time`,

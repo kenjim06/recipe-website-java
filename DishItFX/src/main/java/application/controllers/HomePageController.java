@@ -1,11 +1,11 @@
 package application.controllers;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import application.models.Recipe;
 import application.services.RecipeService;
+import application.services.SupabaseException;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -33,20 +33,25 @@ public class HomePageController extends HeaderController {
     private Label resultsLabel;
 
     private final RecipeService recipeService = new RecipeService();
-    private List<Recipe> recipes;
+    private List<Recipe> recipes = List.of();
+    private String loadError;
 
     @FXML
     private void initialize() {
-        recipes = recipeService.getHomePageRecipes().stream() // Pull from database here
-                .limit(MAX_HOME_PAGE_RECIPES)
-                .toList();
-
         ToggleGroup categoryGroup = new ToggleGroup();
         categoryFilters.getChildren().stream()
                 .filter(ToggleButton.class::isInstance)
                 .map(ToggleButton.class::cast)
                 .forEach(button -> button.setToggleGroup(categoryGroup));
         allCategoryButton.setSelected(true);
+
+        try {
+            recipes = recipeService.getHomePageRecipes().stream()
+                    .limit(MAX_HOME_PAGE_RECIPES)
+                    .toList();
+        } catch (SupabaseException e) {
+            loadError = e.getMessage();
+        }
 
         renderRecipes();
     }
@@ -57,6 +62,13 @@ public class HomePageController extends HeaderController {
     }
 
     private void renderRecipes() {
+        recipeCards.getChildren().clear();
+        if (loadError != null) {
+            resultsLabel.setText("Could not load recipes.");
+            showEmptyState(loadError);
+            return;
+        }
+
         Toggle selectedToggle = categoryFilters.getChildren().stream()
                 .filter(ToggleButton.class::isInstance)
                 .map(ToggleButton.class::cast)
@@ -73,7 +85,6 @@ public class HomePageController extends HeaderController {
                         || recipe.category().equalsIgnoreCase(selectedCategory))
                 .toList();
 
-        recipeCards.getChildren().clear();
         visibleRecipes.stream()
                 .map(recipe -> RecipeCardFactory.create(
                         recipe,
@@ -84,10 +95,15 @@ public class HomePageController extends HeaderController {
         int count = visibleRecipes.size();
         resultsLabel.setText(count + (count == 1 ? " recipe" : " recipes"));
         if (count == 0) {
-            Label emptyState = new Label("No recipes match your search and category.");
-            emptyState.getStyleClass().add("empty-state");
-            recipeCards.getChildren().add(emptyState);
+            showEmptyState("No recipes match your search and category.");
         }
+    }
+
+    private void showEmptyState(String message) {
+        Label emptyState = new Label(message);
+        emptyState.getStyleClass().add("empty-state");
+        emptyState.setWrapText(true);
+        recipeCards.getChildren().add(emptyState);
     }
 
     private void openRecipe(Node source, Recipe recipe) {
