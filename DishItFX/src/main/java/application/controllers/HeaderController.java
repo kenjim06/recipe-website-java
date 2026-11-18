@@ -6,6 +6,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
+import javafx.beans.binding.Bindings;
+import application.services.UserService;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.animation.ScaleTransition;
@@ -17,6 +19,12 @@ public class HeaderController extends NavigationController {
 
     @FXML
     private MenuButton accountButton;
+
+    @FXML
+    private Label profileInitialLabel;
+
+    @FXML
+    private Label accountNameLabel;
 
     @FXML
     private Button homeNavButton;
@@ -41,6 +49,21 @@ public class HeaderController extends NavigationController {
 
     @FXML
     private void initialize() {
+        if (accountButton != null) {
+            accountButton.setAccessibleText("Profile for " + UserService.getAccountLabel());
+        }
+        if (profileInitialLabel != null) {
+            profileInitialLabel.setText(UserService.getProfileInitial());
+        }
+        if (accountNameLabel != null) {
+            accountNameLabel.setText(UserService.getDisplayName());
+            accountButton.sceneProperty().addListener((observable, previous, scene) -> {
+                if (scene != null) {
+                    accountNameLabel.prefWidthProperty().bind(Bindings.max(
+                            140.0, Bindings.min(280.0, scene.widthProperty().multiply(0.24))));
+                }
+            });
+        }
         setBrandFont();
         configureRecipeManagerHover();
         switch (getCurrentPage()) {
@@ -54,12 +77,19 @@ public class HeaderController extends NavigationController {
     }
 
     @FXML
-    private void searchSavedRecipes(ActionEvent event) {
-        searchSavedRecipes(event, searchField.getText().strip());
+    private void searchAllRecipes(ActionEvent event) {
+        searchRecipes(event, searchField.getText().strip());
+    }
+
+    public void setSearchText(String query) {
+        if (searchField != null) {
+            searchField.setText(query);
+        }
     }
 
     @FXML
     private void continueAsGuest() {
+        UserService.loggedOut();
         goHome(new ActionEvent(accountButton, accountButton));
     }
 

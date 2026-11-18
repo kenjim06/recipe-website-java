@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -36,6 +37,23 @@
                            <children>
                               <Label styleClass="form-label" text="Recipe name" />
                               <TextField fx:id="recipeNameField" promptText="e.g. Roasted tomato pasta" styleClass="form-field" />
+                           </children>
+                        </VBox>
+                        <VBox spacing="8.0">
+                           <children>
+                              <Label styleClass="form-label" text="Recipe image (optional)" />
+                              <StackPane fx:id="imagePreviewFrame" maxWidth="Infinity" prefHeight="180.0" styleClass="recipe-image-picker-frame">
+                                 <children>
+                                    <ImageView fx:id="imagePreview" preserveRatio="true" />
+                                    <Label fx:id="imagePlaceholder" styleClass="image-placeholder" text="Choose a photo to preview it here" />
+                                 </children>
+                              </StackPane>
+                              <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                 <children>
+                                    <Button onAction="#chooseImage" styleClass="secondary-button" text="Choose image" />
+                                    <Label fx:id="selectedImageLabel" styleClass="form-description" text="No image selected" wrapText="true" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                         <HBox spacing="16.0">

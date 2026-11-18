@@ -3,7 +3,13 @@ package application.services;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.Set;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -53,39 +59,92 @@ public class RecipeService {
         );
         return recipes;
     }
+
+    public List<Recipe> searchRecipes(String query) {
+        String value = Objects.requireNonNullElse(query, "").strip();
+        if (value.isEmpty()) {
+            return List.of();
+        }
+        String filter = "(recipe_name.ilike.*" + value
+                + "*,category.ilike.*" + value
+                + "*,ingredients.ilike.*" + value
+                + "*,instructions.ilike.*" + value
+                + "*,author_name.ilike.*" + value + "*)";
+        String endpoint = "/rest/v1/recipes?select=*&or="
+                + URLEncoder.encode(filter, StandardCharsets.UTF_8);
+        return fetchRecipes(endpoint);
+    }
     
     public List<Recipe> getSavedRecipes() {
-        ensureAuthenticated();
+        Set<Long> recipeIds = getFavoriteRecipeIds();
+        if (recipeIds.isEmpty()) {
+            return List.of();
+        }
 
-        String response = SupabaseClient.fromEnvironment().request(
+        String idFilter = String.join(",", recipeIds.stream().map(String::valueOf).toList());
+        List<Recipe> matchingRecipes = fetchRecipes(
+                "/rest/v1/recipes?select=*&id=in.(" + idFilter + ")");
+        Map<Long, Recipe> recipesById = new HashMap<>();
+        matchingRecipes.forEach(recipe -> recipesById.put(recipe.id(), recipe));
+
+        List<Recipe> recipes = new ArrayList<>();
+        for (Long id : recipeIds) {
+            Recipe recipe = recipesById.get(id);
+            if (recipe != null) {
+                recipes.add(recipe);
+            }
+        }
+        return List.copyOf(recipes);
+    }
+
+    public static Set<Long> getFavoriteRecipeIds() {
+        ensureAuthenticated();
+        String favoritesResponse = SupabaseClient.fromEnvironment().request(
                 "GET",
-                "/rest/v1/favorites?select=recipe:recipes(*)&user_id=eq."
-                        + UserService.getUserId(),
+                "/rest/v1/favorites?select=recipe_numeric_id&user_id=eq."
+                        + UserService.getUserId() + "&recipe_numeric_id=not.is.null",
                 null,
                 UserService.getAccessToken(),
                 null
         );
 
-        JsonElement parsed = JsonParser.parseString(response);
+        JsonElement parsed = JsonParser.parseString(favoritesResponse);
 
         if (!parsed.isJsonArray()) {
             throw new SupabaseException("Supabase returned an invalid favorites collection.");
         }
-
-        List<Recipe> recipes = new ArrayList<>();
-
+        LinkedHashSet<Long> recipeIds = new LinkedHashSet<>();
         for (JsonElement element : parsed.getAsJsonArray()) {
-            JsonObject favorite = element.getAsJsonObject();
-
-            // The related recipe is returned inside the "recipe" property.
-            JsonElement recipeValue = favorite.get("recipe");
-
-            if (recipeValue != null && recipeValue.isJsonObject()) {
-                recipes.add(fromSupabase(recipeValue.getAsJsonObject()));
-            }
+            recipeIds.add(favoriteRecipeId(element.getAsJsonObject()));
         }
+        return Set.copyOf(recipeIds);
+    }
 
-        return List.copyOf(recipes);
+    public static boolean setFavorite(long recipeId, boolean favorite) {
+        if (!UserService.isLoggedIn()) {
+            throw new SupabaseException("Log in to save favorite recipes.");
+        }
+        ensureAuthenticated();
+        SupabaseClient client = SupabaseClient.fromEnvironment();
+        if (favorite) {
+            JsonObject payload = new JsonObject();
+            payload.addProperty("user_id", UserService.getUserId());
+            payload.addProperty("recipe_numeric_id", recipeId);
+            client.request("POST", "/rest/v1/favorites", payload.toString(),
+                    UserService.getAccessToken(), "return=minimal");
+        } else {
+            client.request("DELETE", "/rest/v1/favorites?user_id=eq."
+                            + UserService.getUserId() + "&recipe_numeric_id=eq." + recipeId,
+                    null, UserService.getAccessToken(), "return=minimal");
+        }
+        return favorite;
+    }
+
+    private static long favoriteRecipeId(JsonObject favorite) {
+        if (favorite.has("recipe_numeric_id") && !favorite.get("recipe_numeric_id").isJsonNull()) {
+            return favorite.get("recipe_numeric_id").getAsLong();
+        }
+        throw new SupabaseException("A saved recipe is missing its numeric recipe reference.");
     }
 
     public List<Recipe> getMyRecipes() {

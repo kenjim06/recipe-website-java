@@ -3,6 +3,8 @@ package application.controllers;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 import application.models.Recipe;
 import application.services.RecipeService;
@@ -25,11 +27,13 @@ public class FavoriteRecipesController extends HeaderController {
     private String searchQuery = "";
     private List<Recipe> recipes = List.of();
     private String loadError;
+    private final Set<Long> favoriteRecipeIds = new HashSet<>();
 
     @FXML
     private void initialize() {
         try {
             recipes = recipeService.getSavedRecipes();
+            recipes.stream().map(Recipe::id).forEach(favoriteRecipeIds::add);
         } catch (SupabaseException e) {
             loadError = e.getMessage();
         }
@@ -64,7 +68,15 @@ public class FavoriteRecipesController extends HeaderController {
                 .map(recipe -> RecipeCardFactory.create(
                         recipe,
                         List.of("Ready in " + recipe.totalTimeMinutes() + " min"),
-                        source -> openRecipe(source, recipe)))
+                        source -> openRecipe(source, recipe), favoriteRecipeIds, null,
+                        isFavorite -> {
+                            if (!isFavorite) {
+                                recipes = recipes.stream()
+                                        .filter(saved -> saved.id() != recipe.id())
+                                        .toList();
+                                renderRecipes();
+                            }
+                        }))
                 .forEach(recipeCards.getChildren()::add);
 
         int count = visibleRecipes.size();

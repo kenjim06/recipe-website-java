@@ -2,11 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CustomMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -17,14 +17,18 @@
    <children>
       <HBox alignment="CENTER" prefWidth="850.0" spacing="8.0">
          <children>
-            <HBox alignment="CENTER_LEFT" prefWidth="170.0" spacing="0.0" styleClass="brand-title">
-               <children>
-                  <Label fx:id="brandDishLabel" styleClass="brand-dish" text="Dish" />
-                  <Label fx:id="brandItLabel" styleClass="brand-it" text="it" />
-               </children>
-            </HBox>
-            <TextField fx:id="searchField" onAction="#searchSavedRecipes" promptText="Search saved recipes..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-            <Button accessibleText="Discover community and popular recipes" mnemonicParsing="false" onAction="#goToExploreRecipes" styleClass="search-button header-action-button">
+            <Button mnemonicParsing="false" onAction="#goHome" styleClass="brand-home-button" accessibleText="Dish It home">
+               <graphic>
+                  <HBox alignment="CENTER_LEFT" prefWidth="170.0" spacing="0.0" styleClass="brand-title">
+                     <children>
+                        <Label fx:id="brandDishLabel" styleClass="brand-dish" text="Dish" />
+                        <Label fx:id="brandItLabel" styleClass="brand-it" text="it" />
+                     </children>
+                  </HBox>
+               </graphic>
+            </Button>
+            <TextField fx:id="searchField" onAction="#searchAllRecipes" promptText="Search all recipes..." styleClass="search-field" HBox.hgrow="ALWAYS" />
+            <Button accessibleText="Search all recipes" mnemonicParsing="false" onAction="#searchAllRecipes" styleClass="search-button header-action-button">
                <graphic>
                   <StackPane prefHeight="22.0" prefWidth="22.0" styleClass="search-icon">
                      <children>
@@ -38,21 +42,22 @@
                   <StackPane prefHeight="34.0" prefWidth="34.0" styleClass="profile-avatar">
                      <children>
                         <Circle fill="#E8ECE4" radius="17.0" stroke="#C9D3C4" strokeWidth="1.0" />
-                        <StackPane prefHeight="17.0" prefWidth="17.0" styleClass="profile-photo-frame">
-                           <children>
-                              <ImageView fitHeight="14.0" fitWidth="14.0" preserveRatio="true" />
-                           </children>
-                        </StackPane>
+                        <Label fx:id="profileInitialLabel" styleClass="profile-initial" text="G" />
                      </children>
                   </StackPane>
                </graphic>
                <items>
+                  <CustomMenuItem hideOnClick="false" styleClass="account-summary-item">
+                     <content>
+                        <Label fx:id="accountNameLabel" maxWidth="240.0" prefWidth="220.0" styleClass="account-name-label" text="Guest" wrapText="true" />
+                     </content>
+                  </CustomMenuItem>
                   <MenuItem mnemonicParsing="false" onAction="#continueAsGuest" text="Stay as a guest" />
                   <MenuItem mnemonicParsing="false" onAction="#loginToAccount" text="Log in" />
                   <MenuItem mnemonicParsing="false" onAction="#createAccount" text="Create an account" />
                </items>
             </MenuButton>
-            <Button fx:id="recipeManagerButton" mnemonicParsing="false" onAction="#goToRecipeManager" styleClass="header-action-button recipe-manager-button" text="Recipe Manager" />
+            <Button fx:id="recipeManagerButton" mnemonicParsing="false" onAction="#goToRecipeManager" styleClass="primary-button recipe-manager-button" text="Recipe Manager" />
          </children>
          <padding>
             <Insets bottom="2.0" />

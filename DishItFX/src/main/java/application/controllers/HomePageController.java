@@ -2,10 +2,13 @@ package application.controllers;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
 import application.models.Recipe;
 import application.services.RecipeService;
 import application.services.SupabaseException;
+import application.services.UserService;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,9 +35,14 @@ public class HomePageController extends HeaderController {
     @FXML
     private Label resultsLabel;
 
+    @FXML
+    private Label pageHeading;
+
     private final RecipeService recipeService = new RecipeService();
     private List<Recipe> recipes = List.of();
     private String loadError;
+    private String searchQuery = "";
+    private final Set<Long> favoriteRecipeIds = new HashSet<>();
 
     @FXML
     private void initialize() {
@@ -52,6 +60,13 @@ public class HomePageController extends HeaderController {
         } catch (SupabaseException e) {
             loadError = e.getMessage();
         }
+        if (UserService.isLoggedIn()) {
+            try {
+                favoriteRecipeIds.addAll(RecipeService.getFavoriteRecipeIds());
+            } catch (SupabaseException ignored) {
+                // Recipe browsing remains available if favorite state cannot be loaded.
+            }
+        }
 
         renderRecipes();
     }
@@ -61,7 +76,27 @@ public class HomePageController extends HeaderController {
         renderRecipes();
     }
 
+    public void setSearchQuery(String query) {
+        searchQuery = Objects.requireNonNullElse(query, "").strip();
+        loadError = null;
+        try {
+            if (searchQuery.isEmpty()) {
+                recipes = recipeService.getHomePageRecipes().stream()
+                        .limit(MAX_HOME_PAGE_RECIPES)
+                        .toList();
+            } else {
+                recipes = recipeService.searchRecipes(searchQuery);
+                allCategoryButton.setSelected(true);
+            }
+        } catch (SupabaseException e) {
+            recipes = List.of();
+            loadError = e.getMessage();
+        }
+        renderRecipes();
+    }
+
     private void renderRecipes() {
+        pageHeading.setText(searchQuery.isEmpty() ? "LATEST RECIPES" : "SEARCH RESULTS");
         recipeCards.getChildren().clear();
         if (loadError != null) {
             resultsLabel.setText("Could not load recipes.");
@@ -89,13 +124,16 @@ public class HomePageController extends HeaderController {
                 .map(recipe -> RecipeCardFactory.create(
                         recipe,
                         List.of("Ready in " + recipe.totalTimeMinutes() + " min"),
-                        source -> openRecipe(source, recipe)))
+                        source -> openRecipe(source, recipe), favoriteRecipeIds, null))
                 .forEach(recipeCards.getChildren()::add);
 
         int count = visibleRecipes.size();
-        resultsLabel.setText(count + (count == 1 ? " recipe" : " recipes"));
+        resultsLabel.setText(count + (count == 1 ? " recipe" : " recipes")
+                + (searchQuery.isEmpty() ? "" : " found"));
         if (count == 0) {
-            showEmptyState("No recipes match your search and category.");
+            showEmptyState(searchQuery.isEmpty()
+                    ? "No recipes match this category."
+                    : "No recipes in the database match your search.");
         }
     }
 

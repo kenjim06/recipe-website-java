@@ -5,11 +5,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import application.models.Recipe;
 import application.services.RecipeService;
 import application.services.SupabaseException;
+import application.services.UserService;
 import application.ui.RecipeCardFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +43,7 @@ public class ExploreRecipesController extends HeaderController {
     private final RecipeService recipeService = new RecipeService();
     private List<Recipe> recipes = List.of();
     private String loadError;
+    private final Set<Long> favoriteRecipeIds = new HashSet<>();
 
     @FXML
     private void initialize() {
@@ -48,6 +51,13 @@ public class ExploreRecipesController extends HeaderController {
             recipes = recipeService.getHomePageRecipes();
         } catch (SupabaseException e) {
             loadError = e.getMessage();
+        }
+        if (UserService.isLoggedIn()) {
+            try {
+                favoriteRecipeIds.addAll(RecipeService.getFavoriteRecipeIds());
+            } catch (SupabaseException ignored) {
+                // Browse community recipes even if favorite state cannot be loaded.
+            }
         }
         renderRecipes();
     }
@@ -150,14 +160,11 @@ public class ExploreRecipesController extends HeaderController {
     }
 
     private VBox createRecipeCard(Recipe listing) {
-        String author = listing.userName().isBlank() ? "Community" : listing.userName();
         return RecipeCardFactory.create(
                 listing,
                 List.of(
-                        "By " + author + " | $" + listing.estimatedCostDollars(),
-                        (listing.popularity() >= 100 ? "Popular | " : "")
-                                + listing.popularity() + " saves"),
-                source -> openRecipe(source, listing));
+                        "Ready in " + listing.totalTimeMinutes() + " min"),
+                source -> openRecipe(source, listing), favoriteRecipeIds, null);
     }
 
     private void openRecipe(Node source, Recipe recipe) {

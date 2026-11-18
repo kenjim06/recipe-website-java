@@ -2,6 +2,7 @@ package application.controllers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.io.File;
 
 import application.models.Recipe;
 import application.services.RecipeService;
@@ -15,6 +16,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 
 public class CreateRecipeController extends HeaderController {
     @FXML
@@ -41,13 +46,48 @@ public class CreateRecipeController extends HeaderController {
     @FXML
     private Label formFeedback;
 
+    @FXML
+    private StackPane imagePreviewFrame;
+
+    @FXML
+    private ImageView imagePreview;
+
+    @FXML
+    private Label imagePlaceholder;
+
+    @FXML
+    private Label selectedImageLabel;
+
     private final RecipeService recipeService = new RecipeService();
+    private File selectedImage;
 
     @FXML
     private void initialize() {
         categoryChoiceBox.setItems(FXCollections.observableArrayList(
                 "Breakfast", "Brunch", "Lunch", "Dinner", "Dessert", "Snack"));
         categoryChoiceBox.setValue("Dinner");
+    }
+
+    @FXML
+    private void chooseImage() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose a recipe image");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                "Recipe images", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp"));
+        File image = chooser.showOpenDialog(imagePreviewFrame.getScene().getWindow());
+        if (image == null) {
+            return;
+        }
+        selectedImage = image;
+        selectedImageLabel.setText(image.getName());
+        imagePlaceholder.setVisible(false);
+        imagePlaceholder.setManaged(false);
+        imagePreview.setViewport(null);
+        imagePreview.setClip(null);
+        imagePreview.setFitWidth(640.0);
+        imagePreview.setFitHeight(160.0);
+        imagePreview.setPreserveRatio(true);
+        imagePreview.setImage(new Image(image.toURI().toString(), true));
     }
 
     @FXML
@@ -62,13 +102,17 @@ public class CreateRecipeController extends HeaderController {
             return;
         }
         if (!UserService.isLoggedIn()) {
-            formFeedback.setText("Log in before saving a recipe to Supabase.");
+            formFeedback.setText("You’re browsing as a guest. Log in or create an account before saving recipes.");
             return;
         }
 
         try {
             int prepTime = Integer.parseInt(prepTimeField.getText().strip());
             int cookTime = Integer.parseInt(cookTimeField.getText().strip());
+            if (prepTime < 0 || cookTime < 0) {
+                formFeedback.setText("Prep and cook times cannot be negative.");
+                return;
+            }
             Recipe recipe = new Recipe(
                     0L,
                     recipeName,
@@ -78,7 +122,7 @@ public class CreateRecipeController extends HeaderController {
                     ingredients,
                     instructions,
                     notesField.getText(),
-                    "",
+                    selectedImage == null ? "" : selectedImage.toURI().toString(),
                     "",
                     0,
                     "",

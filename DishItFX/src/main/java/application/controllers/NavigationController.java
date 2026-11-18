@@ -66,10 +66,15 @@ public abstract class NavigationController {
         navigate(event, "ExploreRecipes");
     }
 
-    protected final void searchSavedRecipes(ActionEvent event, String query) {
+    protected final void searchRecipes(ActionEvent event, String query) {
         String searchQuery = Objects.requireNonNull(query, "query").strip();
-        navigate(event, "FavoriteRecipes", loader ->
-                loader.<FavoriteRecipesController>getController().setSearchQuery(searchQuery));
+        navigate(event, "HomePage", loader -> {
+            loader.<HomePageController>getController().setSearchQuery(searchQuery);
+            Object header = loader.getNamespace().get("headerController");
+            if (header instanceof HeaderController headerController) {
+                headerController.setSearchText(searchQuery);
+            }
+        });
     }
 
     @FXML

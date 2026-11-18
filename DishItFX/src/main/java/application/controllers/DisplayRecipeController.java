@@ -5,8 +5,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import application.models.Recipe;
+import application.services.RecipeService;
+import application.services.SupabaseException;
+import application.services.UserService;
 import application.ui.RecipeImageLoader;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -14,6 +21,9 @@ import javafx.scene.layout.StackPane;
 public class DisplayRecipeController extends HeaderController {
     @FXML
     private Label recipeNameLabel;
+
+    @FXML
+    private Button favoriteButton;
 
     @FXML
     private Label categoryLabel;
@@ -39,7 +49,11 @@ public class DisplayRecipeController extends HeaderController {
     @FXML
     private ImageView recipeImageView;
 
+    private Recipe currentRecipe;
+    private boolean isFavorite;
+
     public void setRecipe(Recipe recipe) {
+        currentRecipe = recipe;
         recipeNameLabel.setText(recipe.name());
         recipeNameLabel.setWrapText(true);
         recipeNameLabel.setMaxWidth(Double.MAX_VALUE);
@@ -52,13 +66,51 @@ public class DisplayRecipeController extends HeaderController {
         ingredientsText.setText(formatIngredients(recipe.ingredients()));
         instructionsText.setText(formatInstructions(recipe.instructions()));
         notesText.setText(recipe.notes().isBlank() ? "No notes." : recipe.notes());
+        isFavorite = false;
+        if (UserService.isLoggedIn()) {
+            try {
+                isFavorite = RecipeService.getFavoriteRecipeIds().contains(recipe.id());
+            } catch (SupabaseException ignored) {
+                // Keep the recipe view available if favorite state cannot be loaded.
+            }
+        }
+        updateFavoriteButton();
+    }
+
+    @FXML
+    private void toggleFavorite(ActionEvent event) {
+        if (currentRecipe == null) {
+            return;
+        }
+        try {
+            isFavorite = RecipeService.setFavorite(currentRecipe.id(), !isFavorite);
+            updateFavoriteButton();
+        } catch (SupabaseException e) {
+            Alert alert = new Alert(UserService.isGuest()
+                    ? Alert.AlertType.INFORMATION : Alert.AlertType.ERROR,
+                    e.getMessage(), ButtonType.OK);
+            alert.showAndWait();
+        }
+    }
+
+    private void updateFavoriteButton() {
+        if (favoriteButton == null) {
+            return;
+        }
+        favoriteButton.setText(isFavorite ? "★" : "☆");
+        favoriteButton.getStyleClass().remove("favorited");
+        if (isFavorite) {
+            favoriteButton.getStyleClass().add("favorited");
+        }
+        favoriteButton.setAccessibleText((isFavorite ? "Remove " : "Add ")
+                + currentRecipe.name() + (isFavorite ? " from favorites" : " to favorites"));
     }
 
     private static String formatIngredients(List<String> ingredients) {
         return ingredients.isEmpty()
                 ? "No ingredients available yet."
                 : ingredients.stream()
-                        .map(ingredient -> "- " + ingredient)
+                        .map(ingredient -> "• " + ingredient)
                         .collect(Collectors.joining(System.lineSeparator()));
     }
 
@@ -66,8 +118,7 @@ public class DisplayRecipeController extends HeaderController {
         return instructions.isEmpty()
                 ? "No instructions available yet."
                 : IntStream.range(0, instructions.size())
-                        .mapToObj(index -> "Step " + (index + 1) + ":"
-                                + System.lineSeparator() + instructions.get(index))
+                        .mapToObj(index -> "Step " + (index + 1) + ": " + instructions.get(index))
                         .collect(Collectors.joining(
                                 System.lineSeparator() + System.lineSeparator()));
     }

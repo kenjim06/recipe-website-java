@@ -10,6 +10,8 @@ import application.models.User;
 public class UserService {
     private static volatile String accessToken;
     private static volatile String userId;
+    private static volatile String email;
+    private static volatile String displayName;
 
     public static void setAccessToken(String token) {
         accessToken = token;
@@ -27,9 +29,30 @@ public class UserService {
         return accessToken != null && !accessToken.isBlank();
     }
 
+    public static boolean isGuest() {
+        return !isLoggedIn();
+    }
+
+    public static String getAccountLabel() {
+        return isLoggedIn() && email != null && !email.isBlank() ? email : "Guest";
+    }
+
+    public static String getDisplayName() {
+        return isLoggedIn() && displayName != null && !displayName.isBlank()
+                ? displayName
+                : isLoggedIn() ? getAccountLabel() : "Guest";
+    }
+
+    public static String getProfileInitial() {
+        String label = getAccountLabel();
+        return label.isEmpty() ? "G" : label.substring(0, 1).toUpperCase(java.util.Locale.ROOT);
+    }
+
     public static void loggedOut() {
         accessToken = null;
         userId = null;
+        email = null;
+        displayName = null;
     }
 
     public static String userLogin(String email, String password) {
@@ -52,6 +75,8 @@ public class UserService {
             throw new SupabaseException("Supabase sign-in response did not contain an access token.");
         }
         accessToken = result.get("access_token").getAsString();
+        UserService.email = email.strip();
+        UserService.displayName = readDisplayName(result, email.strip());
         userId = result.has("user") && result.get("user").isJsonObject()
                 && result.getAsJsonObject("user").has("id")
                 ? result.getAsJsonObject("user").get("id").getAsString()
@@ -83,11 +108,29 @@ public class UserService {
             JsonObject result = JsonParser.parseString(response).getAsJsonObject();
             if (result.has("access_token") && !result.get("access_token").isJsonNull()) {
                 accessToken = result.get("access_token").getAsString();
+                UserService.email = account.email();
+                UserService.displayName = account.displayName();
             }
             userId = result.has("user") && result.get("user").isJsonObject()
                     && result.getAsJsonObject("user").has("id")
                     ? result.getAsJsonObject("user").get("id").getAsString()
                     : null;
         }
+    }
+
+    private static String readDisplayName(JsonObject response, String fallback) {
+        if (response.has("user") && response.get("user").isJsonObject()) {
+            JsonObject user = response.getAsJsonObject("user");
+            if (user.has("user_metadata") && user.get("user_metadata").isJsonObject()) {
+                JsonObject metadata = user.getAsJsonObject("user_metadata");
+                if (metadata.has("display_name") && !metadata.get("display_name").isJsonNull()) {
+                    String value = metadata.get("display_name").getAsString().strip();
+                    if (!value.isBlank()) {
+                        return value;
+                    }
+                }
+            }
+        }
+        return fallback;
     }
 }

@@ -11,7 +11,7 @@
 
 <BorderPane prefHeight="600.0" prefWidth="1000.0" styleClass="home-page" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.HomePageController">
    <top>
-      <fx:include source="Header.fxml" />
+      <fx:include fx:id="header" source="Header.fxml" />
    </top>
    <center>
       <VBox spacing="14.0" BorderPane.alignment="CENTER">
@@ -21,7 +21,7 @@
          <children>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
                <children>
-                  <Label styleClass="heading" text="LATEST RECIPES" />
+                  <Label fx:id="pageHeading" styleClass="heading" text="LATEST RECIPES" />
                   <Label fx:id="resultsLabel" styleClass="results-count" />
                </children>
             </HBox>
