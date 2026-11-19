@@ -47,7 +47,7 @@ environment. Set both in the environment used to launch the app. Use a
 publishable key only; never put a Supabase secret or `service_role` key in this
 client.
 
-Enter into terminal:
+Enter into terminal (make sure you are in  "\DishItFX\" directory before setting environment variables):
 $env:SUPABASE_KEY="1234..."
 $env:SUPABASE_URL="https//..."
 

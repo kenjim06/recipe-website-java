@@ -118,7 +118,7 @@ public class DisplayRecipeController extends HeaderController {
         return instructions.isEmpty()
                 ? "No instructions available yet."
                 : IntStream.range(0, instructions.size())
-                        .mapToObj(index -> "Step " + (index + 1) + ": " + instructions.get(index))
+                        .mapToObj(index -> "Step " + (index + 1) + ": \n\n" + instructions.get(index))
                         .collect(Collectors.joining(
                                 System.lineSeparator() + System.lineSeparator()));
     }

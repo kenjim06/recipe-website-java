@@ -7,17 +7,16 @@
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
-<?import javafx.scene.shape.SVGPath?>
 
 <VBox alignment="CENTER" styleClass="header" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.HeaderController">
    <children>
       <HBox alignment="CENTER" prefWidth="850.0" spacing="8.0">
          <children>
-            <Button mnemonicParsing="false" onAction="#goHome" styleClass="brand-home-button" accessibleText="Dish It home">
+            <Button accessibleText="Dish It home" mnemonicParsing="false" onAction="#goHome" styleClass="brand-home-button">
                <graphic>
                   <HBox alignment="CENTER_LEFT" prefWidth="170.0" spacing="0.0" styleClass="brand-title">
                      <children>
@@ -28,15 +27,6 @@
                </graphic>
             </Button>
             <TextField fx:id="searchField" onAction="#searchAllRecipes" promptText="Search all recipes..." styleClass="search-field" HBox.hgrow="ALWAYS" />
-            <Button accessibleText="Search all recipes" mnemonicParsing="false" onAction="#searchAllRecipes" styleClass="search-button header-action-button">
-               <graphic>
-                  <StackPane prefHeight="22.0" prefWidth="22.0" styleClass="search-icon">
-                     <children>
-                        <SVGPath styleClass="search-glyph" content="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.71.71l.27.28v.79l5 5 1.49-1.49-4.98-5.02zm-5 0A4.5 4.5 0 1 1 10.5 5a4.5 4.5 0 0 1 0 9z" />
-                     </children>
-                  </StackPane>
-               </graphic>
-            </Button>
             <MenuButton fx:id="accountButton" accessibleText="Profile and account options" styleClass="profile-menu-button">
                <graphic>
                   <StackPane prefHeight="34.0" prefWidth="34.0" styleClass="profile-avatar">
@@ -57,7 +47,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#createAccount" text="Create an account" />
                </items>
             </MenuButton>
-            <Button fx:id="recipeManagerButton" mnemonicParsing="false" onAction="#goToRecipeManager" styleClass="primary-button recipe-manager-button" text="Recipe Manager" />
+            <Button fx:id="recipeManagerButton" mnemonicParsing="false" onAction="#goToRecipeManager" styleClass="recipe-manager-button" stylesheets="@application.css" text="Recipe Manager" />
          </children>
          <padding>
             <Insets bottom="2.0" />
